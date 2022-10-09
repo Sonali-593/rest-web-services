@@ -3,11 +3,16 @@ package com.restdemo.rest.user.controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("users") //http://localhost:8080/users?page=1&limit=50
+@RequestMapping("users")
 
 
 /*
-   Class to demo @RequestParam
+   Class to make the parameters optional using the attributes defaultValue and required
+   http://localhost/users?page=1&limit=50
+   http://localhost/users?page=1&limit=25
+   http://localhost/users?page=1
+   http://localhost/users?page=1&limit=50&order=desc
+   http://localhost/users?page=1
  */
 public class UserController {
 
@@ -17,14 +22,18 @@ public class UserController {
     }
 
     /**
-     * Method to read the query parameters page and limit.
+     * Note: required attribute must be used with defaultValue for primitive dataTypes
+     * as they cannot be converted to null.
      * @param page
      * @param limit
+     * @param sort
      * @return
      */
     @GetMapping
-    public String getUser(@RequestParam(value="page") int page, @RequestParam(value="limit") int limit) {
-        return "get user was called with the page: "+page + " and limit: " +limit;
+    public String getUser(@RequestParam(value = "page", defaultValue = "1") int page,
+                          @RequestParam(value = "limit", defaultValue = "50", required = false) int limit,
+                          @RequestParam(value="sort", required = false) String sort) {
+        return "get user was called with the page: " + page + " and limit: " + limit + " and sort: "+ sort;
     }
 
     @PostMapping
