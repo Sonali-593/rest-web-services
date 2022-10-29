@@ -1,5 +1,6 @@
 package com.restdemo.rest.user.controller;
 
+import com.restdemo.rest.user.model.User;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,10 +16,21 @@ import org.springframework.web.bind.annotation.*;
    http://localhost/users?page=1
  */
 public class UserController {
-
+    /**
+     * Method to return a java user object.
+     * @param userId
+     * @return
+     */
     @GetMapping(path="/{userId}")
-    public String getUser(@PathVariable String userId) {
-        return "get user was called with the userId: "+userId;
+    public User getUser(@PathVariable String userId) {
+        User userDetail = new User();
+        userDetail.setUserId(userId);
+        userDetail.setEmail("ss@gmail.com");
+        userDetail.setFirstName("Sonali");
+        userDetail.setLastName("Singh");
+
+        return userDetail;
+
     }
 
     /**
