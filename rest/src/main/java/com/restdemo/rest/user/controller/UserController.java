@@ -1,6 +1,7 @@
 package com.restdemo.rest.user.controller;
 
 import com.restdemo.rest.user.model.User;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -8,20 +9,19 @@ import org.springframework.web.bind.annotation.*;
 
 
 /*
-   Class to make the parameters optional using the attributes defaultValue and required
-   http://localhost/users?page=1&limit=50
-   http://localhost/users?page=1&limit=25
-   http://localhost/users?page=1
-   http://localhost/users?page=1&limit=50&order=desc
-   http://localhost/users?page=1
+   Class to demo sending xml response using attribute produces=MedtiaType
+   Add Accept in key and application/json or application/xml in
+   value of headers based on the response expected
  */
 public class UserController {
     /**
-     * Method to return a java user object.
+     * Method to return the user details in xml and json format,
+     * only mentioned media formats are supported by the api.
      * @param userId
      * @return
      */
-    @GetMapping(path="/{userId}")
+    @GetMapping(path="/{userId}",
+            produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
     public User getUser(@PathVariable String userId) {
         User userDetail = new User();
         userDetail.setUserId(userId);
