@@ -1,7 +1,9 @@
 package com.restdemo.rest.user.controller;
 
 import com.restdemo.rest.user.model.User;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -9,27 +11,27 @@ import org.springframework.web.bind.annotation.*;
 
 
 /*
-   Class to demo sending xml response using attribute produces=MedtiaType
-   Add Accept in key and application/json or application/xml in
-   value of headers based on the response expected
+   Class to demo set and send the HTTP status code using
+  the ResponseEntity object from the spring framework
  */
 public class UserController {
     /**
-     * Method to return the user details in xml and json format,
-     * only mentioned media formats are supported by the api.
+     * Method to return the user details by setting and
+     * sending the HTTP status code using
+     *   the ResponseEntity object from the spring framework.
      * @param userId
      * @return
      */
     @GetMapping(path="/{userId}",
             produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    public User getUser(@PathVariable String userId) {
+    public ResponseEntity<User> getUser(@PathVariable String userId) {
         User userDetail = new User();
         userDetail.setUserId(userId);
         userDetail.setEmail("ss@gmail.com");
         userDetail.setFirstName("Sonali");
         userDetail.setLastName("Singh");
 
-        return userDetail;
+        return new ResponseEntity<User>(userDetail, HttpStatus.OK);
 
     }
 
