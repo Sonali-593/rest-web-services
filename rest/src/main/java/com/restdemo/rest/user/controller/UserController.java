@@ -1,6 +1,7 @@
 package com.restdemo.rest.user.controller;
 
 import com.restdemo.rest.user.model.User;
+import com.restdemo.rest.user.model.request.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 
 /*
-   Class to demo set and send the HTTP status code using
-  the ResponseEntity object from the spring framework
+   Class to demo the usage of @RequestBody i.e to read the request
+   and convert into a java object
  */
 public class UserController {
     /**
@@ -50,9 +51,19 @@ public class UserController {
         return "get user was called with the page: " + page + " and limit: " + limit + " and sort: "+ sort;
     }
 
-    @PostMapping
-    public String createUser(){
-        return "create user was called";
+    /**
+     * Method to read the UserRequest and convert into a User java object.
+     * @param request
+     * @return
+     */
+    @PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
+            produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
+    public ResponseEntity<User> createUser(@RequestBody UserRequest request){
+        User userDetail = new User();
+        userDetail.setEmail(request.getEmail());
+        userDetail.setFirstName(request.getFirstName());
+        userDetail.setLastName(request.getLastName());
+        return new ResponseEntity<User>(userDetail, HttpStatus.CREATED);
     }
 
     @PutMapping

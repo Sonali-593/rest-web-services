@@ -1,7 +1,9 @@
 package com.restdemo.rest.user.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.restdemo.rest.user.model.User;
+import com.restdemo.rest.user.model.request.UserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -18,6 +21,7 @@ import org.springframework.util.MultiValueMap;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -67,8 +71,25 @@ class UserControllerTest {
     }
 
     @Test
-    void createUser_whenCalled_returnsMessage() {
-        assertEquals("create user was called",userController.createUser());
+    void createUser_whenCalledWithUserRequest_returnsUserDetails() throws Exception {
+
+        UserRequest request =new UserRequest();
+        ObjectMapper objectMapper = new ObjectMapper();
+        request.setEmail("s@gmail.com");
+        request.setFirstName("Sonali");
+        request.setLastName("Singh");
+        request.setPassword("123");
+
+        // when - action or behaviour that we are going test
+        ResultActions response = mockMvc.perform( MockMvcRequestBuilders.post("/users").
+                contentType(MediaType.APPLICATION_JSON).
+                accept(MediaType.APPLICATION_JSON).
+                content(objectMapper.writeValueAsString(request)));
+
+        response.andExpect(status().isCreated()).andExpect(jsonPath("$.firstName", is(request.getFirstName()))).
+                andExpect(jsonPath("$.lastName", is(request.getLastName()))).
+                andExpect(jsonPath("$.email", is(request.getEmail())));
+
     }
     @Test
     void updateUser_whenCalled_returnsMessage() {
