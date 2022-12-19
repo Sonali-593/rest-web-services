@@ -7,13 +7,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("users")
 
 
 /*
-   Class to demo the usage of @RequestBody i.e to read the request
-   and convert into a java object
+   Class to demo the validation of HTTP Post request
+   using annotations from javax.validation
  */
 public class UserController {
     /**
@@ -52,13 +54,13 @@ public class UserController {
     }
 
     /**
-     * Method to read the UserRequest and convert into a User java object.
+     * Method to validate the UserRequest
      * @param request
-     * @return
+     * @return ResponseEntity<User>
      */
     @PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
             produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<User> createUser(@RequestBody UserRequest request){
+    public ResponseEntity<User> createUser(@Valid @RequestBody UserRequest request){
         User userDetail = new User();
         userDetail.setEmail(request.getEmail());
         userDetail.setFirstName(request.getFirstName());

@@ -1,6 +1,5 @@
 package com.restdemo.rest.user.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.restdemo.rest.user.model.User;
 import com.restdemo.rest.user.model.request.UserRequest;
@@ -21,7 +20,6 @@ import org.springframework.util.MultiValueMap;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,11 +33,18 @@ class UserControllerTest {
 
     private MockMvc mockMvc;
 
+    private static final String VALID_PWD = "12345678";
+    private static final String INVALID_PWD = "123";
+
     @BeforeEach
     void setUp() {
         this.mockMvc = MockMvcBuilders.standaloneSetup(new UserController()).build();
     }
 
+    /**
+     * Test case is failing, check
+     * @throws Exception
+     */
     @Test
     void getUserWithPathParam_whenCalled_returnsMessageWithPathParam() throws Exception {
         User userDetail = buildUserDetail();
@@ -71,14 +76,11 @@ class UserControllerTest {
     }
 
     @Test
-    void createUser_whenCalledWithUserRequest_returnsUserDetails() throws Exception {
+    void createUser_whenCalledWithUserRequestWithValidRequest_returnsUserDetails() throws Exception {
 
         UserRequest request =new UserRequest();
         ObjectMapper objectMapper = new ObjectMapper();
-        request.setEmail("s@gmail.com");
-        request.setFirstName("Sonali");
-        request.setLastName("Singh");
-        request.setPassword("123");
+        buildUserRequest(request, VALID_PWD);
 
         // when - action or behaviour that we are going test
         ResultActions response = mockMvc.perform( MockMvcRequestBuilders.post("/users").
@@ -91,6 +93,25 @@ class UserControllerTest {
                 andExpect(jsonPath("$.email", is(request.getEmail())));
 
     }
+
+    @Test
+    void createUser_whenCalledWithUserRequestWithInvalidRequest_returnsBadRequest() throws Exception {
+
+        UserRequest request =new UserRequest();
+        ObjectMapper objectMapper = new ObjectMapper();
+        buildUserRequest(request, INVALID_PWD);
+
+
+        // when - action or behaviour that we are going test
+        ResultActions response = mockMvc.perform( MockMvcRequestBuilders.post("/users").
+                contentType(MediaType.APPLICATION_JSON).
+                accept(MediaType.APPLICATION_JSON).
+                content(objectMapper.writeValueAsString(request)));
+
+        response.andExpect(status().isBadRequest());
+
+    }
+
     @Test
     void updateUser_whenCalled_returnsMessage() {
         assertEquals("update user was called",userController.updateUser());
@@ -108,5 +129,12 @@ class UserControllerTest {
         userDetail.setFirstName("Sonali");
         userDetail.setLastName("Singh");
         return userDetail;
+    }
+
+    private static void buildUserRequest(UserRequest request, String password) {
+        request.setEmail("s@gmail.com");
+        request.setFirstName("Sonali");
+        request.setLastName("Singh");
+        request.setPassword(password);
     }
 }
