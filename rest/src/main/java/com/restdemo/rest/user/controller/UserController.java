@@ -5,20 +5,21 @@ import com.restdemo.rest.user.model.request.UserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("users")
 
 
 /*
-   Class to demo the usage of @RequestBody i.e to read the request
-   and convert into a java object
+   Class to demo the usage of @Valid to validate request accepted from the user.
  */
 public class UserController {
     /**
-     * Method to return the user details by setting and
-     * sending the HTTP status code using
+     * Method to validate the user request using @Valid
      *   the ResponseEntity object from the spring framework.
      * @param userId
      * @return
@@ -58,7 +59,7 @@ public class UserController {
      */
     @PostMapping(consumes = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE },
             produces = { MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<User> createUser(@RequestBody UserRequest request){
+    public ResponseEntity<User> createUser(@Valid @RequestBody UserRequest request){
         User userDetail = new User();
         userDetail.setEmail(request.getEmail());
         userDetail.setFirstName(request.getFirstName());
