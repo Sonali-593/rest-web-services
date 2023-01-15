@@ -10,11 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -75,10 +77,7 @@ class UserControllerTest {
 
         UserRequest request =new UserRequest();
         ObjectMapper objectMapper = new ObjectMapper();
-        request.setEmail("s@gmail.com");
-        request.setFirstName("Sonali");
-        request.setLastName("Singh");
-        request.setPassword("123");
+        buildUserRequest(request, "s@gmail.com", "12345678");
 
         // when - action or behaviour that we are going test
         ResultActions response = mockMvc.perform( MockMvcRequestBuilders.post("/users").
@@ -89,6 +88,41 @@ class UserControllerTest {
         response.andExpect(status().isCreated()).andExpect(jsonPath("$.firstName", is(request.getFirstName()))).
                 andExpect(jsonPath("$.lastName", is(request.getLastName()))).
                 andExpect(jsonPath("$.email", is(request.getEmail())));
+
+    }
+
+    @Test
+    void createUser_whenCalledWithInvalidEmailAddress_returnsBadRequest() throws Exception {
+
+
+        UserRequest request =new UserRequest();
+        ObjectMapper objectMapper = new ObjectMapper();
+        buildUserRequest(request, "sgmail.com", "12345678");
+
+        // when - action or behaviour that we are going test
+        ResultActions response = mockMvc.perform( MockMvcRequestBuilders.post("/users").
+                contentType(MediaType.APPLICATION_JSON).
+                accept(MediaType.APPLICATION_JSON).
+                content(objectMapper.writeValueAsString(request)));
+
+        response.andExpect(status().isBadRequest());
+
+    }
+
+    @Test
+    void createUser_whenCalledWithInvalidPassword_returnsBadRequest() throws Exception {
+
+        UserRequest request =new UserRequest();
+        ObjectMapper objectMapper = new ObjectMapper();
+        buildUserRequest(request, "s@gmail.com", "123");
+
+        // when - action or behaviour that we are going test
+        ResultActions response = mockMvc.perform( MockMvcRequestBuilders.post("/users").
+                contentType(MediaType.APPLICATION_JSON).
+                accept(MediaType.APPLICATION_JSON).
+                content(objectMapper.writeValueAsString(request)));
+
+        response.andExpect(status().isBadRequest());
 
     }
     @Test
@@ -108,5 +142,12 @@ class UserControllerTest {
         userDetail.setFirstName("Sonali");
         userDetail.setLastName("Singh");
         return userDetail;
+    }
+
+    private static void buildUserRequest(UserRequest request, String email, String password) {
+        request.setEmail(email);
+        request.setFirstName("Sonali");
+        request.setLastName("Singh");
+        request.setPassword(password);
     }
 }
