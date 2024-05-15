@@ -6,11 +6,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Component
-@Qualifier("BMW")
+@Primary
 public class BMW implements Engine{
 
     @Override
     public String display() {
         return "BMW Engine";
     }
+    //mark @Primary at the class level
 }
